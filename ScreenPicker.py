@@ -18,9 +18,9 @@ def draw_panel(layout, context):
     layout.prop(context.scene, 'picker_mean', text='Mean')
     layout.prop(context.scene, 'picker_median', text='Median')
     layout.prop(context.scene, 'picker_min', text='Min')
-    layout.operator(IMAGE_OT_screen_picker.bl_idname, text='3x3 Color Picker').sqrt_length = 3
-    layout.operator(IMAGE_OT_screen_picker.bl_idname, text='5x5 Color Picker').sqrt_length = 5
-    layout.operator(IMAGE_OT_screen_mean.bl_idname, text='Pick Window')
+    layout.operator(IMAGE_OT_screen_picker.bl_idname, text='3x3 Color Picker', icon='EYEDROPPER').sqrt_length = 3
+    layout.operator(IMAGE_OT_screen_picker.bl_idname, text='5x5 Color Picker', icon='EYEDROPPER').sqrt_length = 5
+    layout.operator(IMAGE_OT_screen_rect.bl_idname, text='Rect Color Picker', icon='SELECT_SET')
 
 class IMAGE_PT_color_picker(bpy.types.Panel):
     bl_label = "Color Picker Pro"
@@ -101,8 +101,8 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
         context.window.cursor_modal_set('EYEDROPPER')
         return {'RUNNING_MODAL'}
 
-class IMAGE_OT_screen_mean(bpy.types.Operator):
-    bl_idname = "image.screen_mean"
+class IMAGE_OT_screen_rect(bpy.types.Operator):
+    bl_idname = "image.screen_rect"
     bl_label = "Screen Mean"
     bl_description = "Select a rectangle of the screen and extract its color information"
     bl_options = {'REGISTER', 'UNDO'}
@@ -142,7 +142,7 @@ class IMAGE_OT_screen_mean(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
 
-classes = [IMAGE_OT_screen_picker, IMAGE_OT_screen_mean, IMAGE_PT_color_picker, VIEW_PT_color_picker, CLIP_PT_color_picker]
+classes = [IMAGE_OT_screen_picker, IMAGE_OT_screen_rect, IMAGE_PT_color_picker, VIEW_PT_color_picker, CLIP_PT_color_picker]
 
 def register():
     scene = bpy.types.Scene
