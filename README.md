@@ -1,6 +1,11 @@
 # Color Picker Pro
 This Blender addon extends functionality of the software's color picker.
 
+Please consider contributing by buying from the [Blender Market](https://blendermarket.com/products/color-picker-pro) (which funds Blender) or directly to me via Paypal.
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&hosted_button_id=LLDQGZ94K3ZUW)
+
+
 ## Average Color Picker
 Color pick anywhere in the Blender window.  Based on the button you press, the operator will either extract a 3x3 or 5x5 square of pixels and update the panels with the square's max, min, mean, and median.  Left mouse click to save the colors and close.  Press the right mouse button or the escape button to cancel the changes.
 
