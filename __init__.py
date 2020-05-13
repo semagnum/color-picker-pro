@@ -3,7 +3,7 @@ bl_info = {
     "author": "Spencer Magnusson",
     "version": (0, 5),
     "blender": (2, 80, 0),
-    "location": "Image Editor, Clip Editor, 3D View",
+    "location": "(Image Editor, Clip Editor, and 3D View) -> Misc",
     "description": "Extends color picker with a few extra features",
     "tracker_url": "https://github.com/semagnum/color-picker-pro/issues",
     "category": "Generic",
