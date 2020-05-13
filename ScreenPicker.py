@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Color Picker Pro",
     "author": "Spencer Magnusson",
-    "version": (1, 0),
+    "version": (0, 5),
     "blender": (2, 80, 0),
     "location": "Image Editor, Clip Editor, 3D View",
     "description": "Extends color picker with a few extra features",
@@ -52,6 +52,7 @@ class CLIP_PT_color_picker(bpy.types.Panel):
 class IMAGE_OT_screen_picker(bpy.types.Operator):
     bl_idname = "image.screen_picker"
     bl_label = "Screen Picker"
+    bl_description = "Extract color information from multiple adjacent pixels"
     bl_options = {'REGISTER'}
     
     # square root of number of pixels taken into account, 3 is a 3x3 square
@@ -103,6 +104,7 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
 class IMAGE_OT_screen_mean(bpy.types.Operator):
     bl_idname = "image.screen_mean"
     bl_label = "Screen Mean"
+    bl_description = "Select a rectangle of the screen and extract its color information"
     bl_options = {'REGISTER', 'UNDO'}
 
     def modal(self, context, event):
@@ -147,18 +149,22 @@ def register():
     scene.picker_max = bpy.props.FloatVectorProperty(
         default=(1.0, 1.0, 1.0),
         precision=4,
+        description='The max RGB values of the picked pixels',
         subtype='COLOR_GAMMA')
     scene.picker_min = bpy.props.FloatVectorProperty(
         default=(0.0, 0.0, 0.0),
         precision=4,
+        description='The min RGB values of the picked pixels',
         subtype='COLOR_GAMMA')
     scene.picker_median = bpy.props.FloatVectorProperty(
         default=(0.5, 0.5, 0.5),
         precision=4,
+        description='The median RGB values of the picked pixels',
         subtype='COLOR_GAMMA')
     scene.picker_mean = bpy.props.FloatVectorProperty(
         default=(0.5, 0.5, 0.5),
         precision=4,
+        description='The mean RGB values of the picked pixels',
         subtype='COLOR_GAMMA')
     for cls in classes:
         bpy.utils.register_class(cls)
