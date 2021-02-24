@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Color Picker Pro",
     "author": "Spencer Magnusson",
-    "version": (0, 6),
+    "version": (0, 7),
     "blender": (2, 90, 0),
     "location": "(Image Editor, Clip Editor, and 3D View) -> Misc",
     "description": "Extends color picker with a few extra features",
@@ -74,9 +74,14 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
             bgl.glReadPixels(start_x, start_y,self.sqrt_length,self.sqrt_length,bgl.GL_RGB,bgl.GL_FLOAT,screen_buffer)
             
             channels = np.array(screen_buffer)
+
+            dot = np.sum(channels, axis=1)
+            max_ind = np.argmax(dot, axis=0)
+            min_ind = np.argmin(dot, axis=0)
+
             context.scene.picker_mean = tuple(np.mean(channels, axis=0))
-            context.scene.picker_max = tuple(np.max(channels, axis=0))
-            context.scene.picker_min = tuple(np.min(channels, axis=0))
+            context.scene.picker_max = tuple(channels[max_ind])
+            context.scene.picker_min = tuple(channels[min_ind])
             context.scene.picker_median = tuple(np.median(channels, axis=0))
             
         if event.type == 'LEFTMOUSE':
