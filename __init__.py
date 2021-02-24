@@ -1,8 +1,8 @@
 bl_info = {
     "name": "Color Picker Pro",
     "author": "Spencer Magnusson",
-    "version": (0, 5),
-    "blender": (2, 80, 0),
+    "version": (0, 6),
+    "blender": (2, 90, 0),
     "location": "(Image Editor, Clip Editor, and 3D View) -> Misc",
     "description": "Extends color picker with a few extra features",
     "tracker_url": "https://github.com/semagnum/color-picker-pro/issues",
@@ -68,6 +68,7 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
             start_y = max(event.mouse_y - distance, 0)
             
             buffer_size = self.sqrt_length ** 2
+            bgl.glBindFramebuffer(bgl.GL_READ_FRAMEBUFFER, 0)
             screen_buffer = bgl.Buffer(bgl.GL_FLOAT, [buffer_size,3])
             
             bgl.glReadPixels(start_x, start_y,self.sqrt_length,self.sqrt_length,bgl.GL_RGB,bgl.GL_FLOAT,screen_buffer)
@@ -118,6 +119,7 @@ class IMAGE_OT_screen_rect(bpy.types.Operator):
             
             x_len = (end_x - start_x)
             buffer_size = (end_y - start_y) * x_len
+            bgl.glBindFramebuffer(bgl.GL_READ_FRAMEBUFFER, 0)
             screen_buffer = bgl.Buffer(bgl.GL_FLOAT, [buffer_size,3])
             
             for x_ind, x in enumerate(range(start_x, end_x)):
