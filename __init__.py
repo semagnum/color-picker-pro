@@ -7,8 +7,8 @@ from .panels import IMAGE_PT_color_picker, VIEW_PT_color_picker, CLIP_PT_color_p
 bl_info = {
     'name': 'Color Picker Pro',
     'author': 'Spencer Magnusson',
-    'version': (0, 7),
-    'blender': (2, 90, 0),
+    'version': (0, 8, 0),
+    'blender': (2, 93, 0),
     'location': '(Image Editor, Clip Editor, and 3D View) -> Misc',
     'description': 'Extends color picker with a few extra features',
     'tracker_url': 'https://github.com/semagnum/color-picker-pro/issues',
