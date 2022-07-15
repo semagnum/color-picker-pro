@@ -7,9 +7,15 @@ Please consider contributing by buying from the [Blender Market](https://blender
 
 
 ## Average Color Picker
-Color pick anywhere in the Blender window.  Based on the button you press, the operator will either extract a 3x3 or 5x5 square of pixels and update the panels with the square's max, min, mean, and median.  Left mouse click to save the colors and close.  Press the right mouse button or the escape button to cancel the changes.
+Allows you to color pick anywhere in the Blender window in a 3x3 or 5x5 tile around your cursor.
+As you hover your cursor, the panels will update with the tile's max, min, mean, and median colors. 
+Left mouse click to save the colors and stop the color picker.
+Press the right mouse button or the escape button to stop the color picker without saving the colors.
 
 ## Rectangle Color Picker
-Left click to pin one "corner" of the rectangle.  Afterwards, right click to pin the opposite "corner" of the rectangle (you can go in any direction).  After pinning these corners, the operator will extract the rectangle's max, min, mean, and median.  Press escape (or right click if you haven't left clicked yet) to cancel.
+Left click to pin one "corner" of the rectangle. 
+Afterwards, right click to pin the opposite "corner" of the rectangle (you can go in any direction). 
+After pinning both corners, the operator will extract the rectangle's max, min, mean, and median.
+Press escape (or right click, if you haven't left-clicked yet) to cancel.
 
 **Note**: these values are gamma corrected, so they reflect the values you see on the screen, *not* the true values in Blender before the colorspace conversion.

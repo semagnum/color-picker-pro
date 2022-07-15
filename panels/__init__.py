@@ -7,18 +7,18 @@ panel_title = 'Color Picker Pro'
 
 
 def draw_panel(layout, context):
-    scene = context.scene
-    layout.prop(scene, 'picker_max', text='Max')
-    layout.prop(scene, 'picker_mean', text='Mean')
-    layout.prop(scene, 'picker_median', text='Median')
-    layout.prop(scene, 'picker_min', text='Min')
+    wm = context.window_manager
+    layout.prop(wm, 'picker_max', text='Max')
+    layout.prop(wm, 'picker_mean', text='Mean')
+    layout.prop(wm, 'picker_median', text='Median')
+    layout.prop(wm, 'picker_min', text='Min')
     layout.operator(IMAGE_OT_screen_picker.bl_idname, text='3x3 Color Picker', icon='EYEDROPPER').sqrt_length = 3
     layout.operator(IMAGE_OT_screen_picker.bl_idname, text='5x5 Color Picker', icon='EYEDROPPER').sqrt_length = 5
     layout.prop(context.scene, 'custom_size', slider=True)
-    tile_str = str(scene.custom_size)
+    tile_str = str(wm.custom_size)
     custom_label = 'Custom ' + tile_str + 'x' + tile_str + ' Color Picker'
     layout.operator(IMAGE_OT_screen_picker.bl_idname, text=custom_label,
-                    icon='EYEDROPPER').sqrt_length = scene.custom_size
+                    icon='EYEDROPPER').sqrt_length = wm.custom_size
     layout.separator()
     layout.operator(IMAGE_OT_screen_rect.bl_idname, text='Rect Color Picker', icon='SELECT_SET')
 
