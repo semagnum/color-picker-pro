@@ -14,7 +14,7 @@ def draw_panel(layout, context):
     layout.prop(wm, 'picker_min', text='Min')
     layout.operator(IMAGE_OT_screen_picker.bl_idname, text='3x3 Color Picker', icon='EYEDROPPER').sqrt_length = 3
     layout.operator(IMAGE_OT_screen_picker.bl_idname, text='5x5 Color Picker', icon='EYEDROPPER').sqrt_length = 5
-    layout.prop(context.scene, 'custom_size', slider=True)
+    layout.prop(wm, 'custom_size', slider=True)
     tile_str = str(wm.custom_size)
     custom_label = 'Custom ' + tile_str + 'x' + tile_str + ' Color Picker'
     layout.operator(IMAGE_OT_screen_picker.bl_idname, text=custom_label,
