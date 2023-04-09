@@ -17,7 +17,22 @@ Created by Spencer Magnusson
 
 import bpy
 import gpu
+from gpu_extras.batch import batch_for_shader
 import numpy as np
+
+vertices = ((0, 0), (50, 0),
+            (0, -50), (50, -50))
+indices = ((0, 1, 2), (2, 1, 3))
+shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+
+def draw(operator):
+    m_x, m_y = operator.x, operator.y
+    curr_color = tuple(list(operator.curr_color) + [1.0])
+    shader.uniform_float("color", curr_color)
+
+    draw_verts = tuple((m_x + x, m_y + y) for x,y in vertices)
+    batch = batch_for_shader(shader, 'TRIS', {"pos": draw_verts}, indices=indices)
+    batch.draw(shader)
 
 
 class IMAGE_OT_screen_picker(bpy.types.Operator):
@@ -39,11 +54,16 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
             start_x = max(event.mouse_x - distance, 0)
             start_y = max(event.mouse_y - distance, 0)
 
+            self.x = event.mouse_region_x
+            self.y = event.mouse_region_y
+
             fb = gpu.state.active_framebuffer_get()
             screen_buffer = fb.read_color(start_x, start_y, self.sqrt_length, self.sqrt_length, 3, 0, 'FLOAT')
 
-            channels = np.array(screen_buffer.to_list())\
-                .reshape((self.sqrt_length * self.sqrt_length, 3))
+            channels = np.array(screen_buffer.to_list()).reshape((self.sqrt_length * self.sqrt_length, 3))
+
+            curr_picker_buffer = fb.read_color(event.mouse_x, event.mouse_y, 1, 1, 3, 0, 'FLOAT')
+            self.curr_color = np.array(curr_picker_buffer.to_list()).reshape(-1)
 
             dot = np.sum(channels, axis=1)
             max_ind = np.argmax(dot, axis=0)
@@ -56,6 +76,8 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
 
         if event.type == 'LEFTMOUSE':
             context.window.cursor_modal_restore()
+            space = getattr(bpy.types, self.space_type)
+            space.draw_handler_remove(self._handler, 'WINDOW')
             return {'FINISHED'}
 
         elif event.type in {'RIGHTMOUSE', 'ESC'}:
@@ -64,6 +86,9 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
             wm.picker_max = self.prev_max
             wm.picker_min = self.prev_min
             context.window.cursor_modal_restore()
+
+            space = getattr(bpy.types, self.space_type)
+            space.draw_handler_remove(self._handler, 'WINDOW')
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
@@ -76,4 +101,9 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
         self.prev_min = (wm.picker_min[0], wm.picker_min[1], wm.picker_min[2])
         context.window_manager.modal_handler_add(self)
         context.window.cursor_modal_set('EYEDROPPER')
+
+        self.space_type = context.space_data.__class__.__name__
+        space = getattr(bpy.types, self.space_type)
+        self._handler = space.draw_handler_add(draw, (self,), 'WINDOW', 'POST_PIXEL')
+
         return {'RUNNING_MODAL'}
