@@ -22,17 +22,29 @@ import numpy as np
 
 vertices = ((0, 0), (50, 0),
             (0, -50), (50, -50))
-indices = ((0, 1, 2), (2, 1, 3))
-shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+indices = ((0, 1, 2), (2, 1, 3), (0, 1, 1), (1, 2, 2), (2, 2, 3), (3, 0, 0))
+fill_shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+edge_shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
 
 def draw(operator):
     m_x, m_y = operator.x, operator.y
+    length = operator.sqrt_length + 5
     curr_color = tuple(list(operator.curr_color) + [1.0])
-    shader.uniform_float("color", curr_color)
+    fill_shader.uniform_float("color", curr_color)
 
-    draw_verts = tuple((m_x + x, m_y + y) for x,y in vertices)
-    batch = batch_for_shader(shader, 'TRIS', {"pos": draw_verts}, indices=indices)
-    batch.draw(shader)
+    draw_verts = tuple((m_x + x + length, m_y + y - length) for x,y in vertices)
+    batch = batch_for_shader(fill_shader, 'TRIS', {"pos": draw_verts}, indices=indices)
+    batch.draw(fill_shader)
+
+    edge_shader.uniform_float("color", (1.0, 0.0, 0.0, 1.0))
+
+    edges = (draw_verts[0], draw_verts[1],
+             draw_verts[0], draw_verts[2],
+             draw_verts[2], draw_verts[3],
+             draw_verts[1], draw_verts[3])
+
+    edge_batch = batch_for_shader(edge_shader, 'LINES', {"pos": edges})
+    edge_batch.draw(edge_shader)
 
 
 class IMAGE_OT_screen_picker(bpy.types.Operator):
