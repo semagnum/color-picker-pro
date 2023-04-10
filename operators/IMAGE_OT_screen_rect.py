@@ -17,7 +17,28 @@ Created by Spencer Magnusson
 
 import bpy
 import gpu
+from gpu_extras.batch import batch_for_shader
 import numpy as np
+import time
+
+shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+indices = ((0, 1, 2), (2, 1, 3))
+
+def draw(operator):
+    start_x, end_x = sorted([operator.draw_start_x, operator.draw_end_x])
+    start_y, end_y = sorted([operator.draw_start_y, operator.draw_end_y])
+
+    if start_x == -1:
+        return
+
+    draw_verts = ((start_x, start_y), (start_x, end_y),
+                  (start_x, end_y), (end_x, end_y),
+                  (end_x, end_y), (end_x, start_y),
+                  (end_x, start_y), (start_x, start_y))
+
+    shader.uniform_float('color', (1.0, 1.0, 1.0, 1.0))
+    batch = batch_for_shader(shader, 'LINES', {"pos": draw_verts})
+    batch.draw(shader)
 
 
 class IMAGE_OT_screen_rect(bpy.types.Operator):
@@ -27,13 +48,25 @@ class IMAGE_OT_screen_rect(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def modal(self, context, event):
+        self.draw_end_x, self.draw_end_y = event.mouse_region_x, event.mouse_region_y
+
+        context.region.tag_redraw()
+
         if event.type == 'LEFTMOUSE':
             self.start_x, self.start_y = event.mouse_x, event.mouse_y
+            self.draw_start_x, self.draw_start_y = event.mouse_region_x, event.mouse_region_y
         elif event.type == 'RIGHTMOUSE':
+            self.cleanup()
+
             if self.start_x == -1 or self.start_y == -1:
                 return {'CANCELLED'}
-            start_x, end_x = sorted([self.start_x, event.mouse_x])
-            start_y, end_y = sorted([self.start_y, event.mouse_y])
+
+            self.end_x, self.end_y = event.mouse_x, event.mouse_y
+            self.finished = time.time()
+        elif self.finished is not None and (time.time() - self.finished) > 0.2:
+
+            start_x, end_x = sorted([self.start_x, self.end_x])
+            start_y, end_y = sorted([self.start_y, self.end_y])
 
             x_len = (end_x - start_x) + 1
             y_len = (end_y - start_y) + 1
@@ -41,8 +74,7 @@ class IMAGE_OT_screen_rect(bpy.types.Operator):
             fb = gpu.state.active_framebuffer_get()
             screen_buffer = fb.read_color(start_x, start_y, x_len, y_len, 3, 0, 'FLOAT')
 
-            channels = np.array(screen_buffer.to_list())\
-                .reshape((x_len * y_len, 3))
+            channels = np.array(screen_buffer.to_list()).reshape((x_len * y_len, 3))
 
             wm = context.window_manager
 
@@ -53,11 +85,28 @@ class IMAGE_OT_screen_rect(bpy.types.Operator):
             context.area.tag_redraw()
             return {'FINISHED'}
         elif event.type == 'ESC':
+            self.cleanup()
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
 
+    def cleanup(self):
+        if self._handler is not None:
+            space = getattr(bpy.types, self.space_type)
+            space.draw_handler_remove(self._handler, 'WINDOW')
+            self._handler = None
+
     def invoke(self, context, event):
         self.start_x, self.start_y = -1, -1
+
+        self.draw_start_x, self.draw_start_y = -1, -1
+        self.draw_end_x, self.draw_end_y = -1, -1
+
+        self.space_type = context.space_data.__class__.__name__
+        space = getattr(bpy.types, self.space_type)
+        self._handler = space.draw_handler_add(draw, (self,), 'WINDOW', 'POST_PIXEL')
+
+        self.finished = None
+
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
