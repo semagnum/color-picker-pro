@@ -23,8 +23,11 @@ import numpy as np
 vertices = ((0, 0), (50, 0),
             (0, -50), (50, -50))
 indices = ((0, 1, 2), (2, 1, 3), (0, 1, 1), (1, 2, 2), (2, 2, 3), (3, 0, 0))
-fill_shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
-edge_shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+
+UNIFORM_COLOR = '2D_UNIFORM_COLOR' if bpy.app.version < (3, 4, 0) else 'UNIFORM_COLOR'
+
+fill_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
+edge_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
 
 def draw(operator):
     m_x, m_y = operator.x, operator.y
