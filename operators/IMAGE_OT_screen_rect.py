@@ -22,9 +22,13 @@ import numpy as np
 import time
 
 UNIFORM_COLOR = '2D_UNIFORM_COLOR' if bpy.app.version < (3, 4, 0) else 'UNIFORM_COLOR'
-
-shader = gpu.shader.from_builtin(UNIFORM_COLOR)
 indices = ((0, 1, 2), (2, 1, 3))
+try:
+    shader = gpu.shader.from_builtin(UNIFORM_COLOR)
+except SystemError as e:
+    import logging
+    log = logging.getLogger(__name__)
+    log.warn('Failed to initialize gpu shader, draw will not work as expected')
 
 def draw(operator):
     start_x, end_x = sorted([operator.draw_start_x, operator.draw_end_x])

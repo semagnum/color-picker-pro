@@ -14,7 +14,6 @@ Created by Spencer Magnusson
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import bpy
 import gpu
 from gpu_extras.batch import batch_for_shader
@@ -25,9 +24,13 @@ vertices = ((0, 0), (50, 0),
 indices = ((0, 1, 2), (2, 1, 3), (0, 1, 1), (1, 2, 2), (2, 2, 3), (3, 0, 0))
 
 UNIFORM_COLOR = '2D_UNIFORM_COLOR' if bpy.app.version < (3, 4, 0) else 'UNIFORM_COLOR'
-
-fill_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
-edge_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
+try:
+    fill_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
+    edge_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
+except SystemError as e:
+    import logging
+    log = logging.getLogger(__name__)
+    log.warn('Failed to initialize gpu shader, draw will not work as expected')
 
 def draw(operator):
     m_x, m_y = operator.x, operator.y
