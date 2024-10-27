@@ -102,6 +102,9 @@ class IMAGE_OT_screen_rect(bpy.types.Operator):
             space.draw_handler_remove(self._handler, 'WINDOW')
             self._handler = None
 
+        bpy.context.area.header_text_set(None)
+        bpy.context.window.cursor_modal_restore()
+
     def invoke(self, context, event):
         self.start_x, self.start_y = -1, -1
 
@@ -113,6 +116,11 @@ class IMAGE_OT_screen_rect(bpy.types.Operator):
         self._handler = space.draw_handler_add(draw, (self,), 'WINDOW', 'POST_PIXEL')
 
         self.finished = None
+
+        context.area.header_text_set('Left click to set first corner of rectangle, '
+                                     'right click to set opposite corner, '
+                                     'Escape key to cancel')
+        context.window.cursor_modal_set('CROSSHAIR')
 
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
