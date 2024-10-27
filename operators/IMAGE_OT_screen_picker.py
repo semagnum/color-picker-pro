@@ -56,8 +56,12 @@ def draw(operator):
 class IMAGE_OT_screen_picker(bpy.types.Operator):
     bl_idname = 'image.screen_picker'
     bl_label = 'Screen Picker'
-    bl_description = 'Extract color information from multiple adjacent pixels'
     bl_options = {'REGISTER'}
+
+    @classmethod
+    def description(cls, _context, properties):
+        """Use pixel size in tooltip."""
+        return 'Extract color from a {}x{} square of pixels'.format(properties.sqrt_length, properties.sqrt_length)
 
     # square root of number of pixels taken into account, 3 is a 3x3 square
     sqrt_length: bpy.props.IntProperty()
@@ -93,9 +97,7 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
             wm.picker_median = tuple(np.median(channels, axis=0))
 
         if event.type == 'LEFTMOUSE':
-            context.window.cursor_modal_restore()
-            space = getattr(bpy.types, self.space_type)
-            space.draw_handler_remove(self._handler, 'WINDOW')
+            self.cancel(context)
             return {'FINISHED'}
 
         elif event.type in {'RIGHTMOUSE', 'ESC'}:
@@ -103,13 +105,17 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
             wm.picker_median = self.prev_median
             wm.picker_max = self.prev_max
             wm.picker_min = self.prev_min
-            context.window.cursor_modal_restore()
-
-            space = getattr(bpy.types, self.space_type)
-            space.draw_handler_remove(self._handler, 'WINDOW')
+            self.cancel(context)
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
+
+    def cancel(self, context):
+        context.area.header_text_set(None)
+        context.window.cursor_modal_restore()
+        space = getattr(bpy.types, self.space_type)
+        space.draw_handler_remove(self._handler, 'WINDOW')
+        return {'CANCELLED'}
 
     def invoke(self, context, event):
         wm = context.window_manager
@@ -119,6 +125,8 @@ class IMAGE_OT_screen_picker(bpy.types.Operator):
         self.prev_min = (wm.picker_min[0], wm.picker_min[1], wm.picker_min[2])
         context.window_manager.modal_handler_add(self)
         context.window.cursor_modal_set('EYEDROPPER')
+        context.area.header_text_set('Left click mouse to pick colors, '
+                                     'right click or Escape key to cancel')
 
         self.space_type = context.space_data.__class__.__name__
         space = getattr(bpy.types, self.space_type)
