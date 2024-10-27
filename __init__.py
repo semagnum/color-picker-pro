@@ -81,6 +81,12 @@ def unregister():
     for cls in classes[::-1]:
         bpy.utils.unregister_class(cls)
 
+    for name, _ in window_manager_props:
+        try:
+            delattr(bpy.types.WindowManager, name)
+        except AttributeError:
+            pass
+
 
 if __name__ == '__main__':
     register()
