@@ -96,6 +96,7 @@ window_manager_props = [
         soft_max=100,
         soft_min=5,
         name='Custom Tile Size',
+        subtype='PIXEL',
         description='Custom tile size for color picker')),
 ]
 
