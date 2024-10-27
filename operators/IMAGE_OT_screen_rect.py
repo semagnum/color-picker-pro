@@ -49,7 +49,7 @@ def draw(operator):
 
 class IMAGE_OT_screen_rect(bpy.types.Operator):
     bl_idname = 'image.screen_rect'
-    bl_label = 'Screen Mean'
+    bl_label = 'Rectangle Color Picker'
     bl_description = 'Select a rectangle of the screen and extract its color information'
     bl_options = {'REGISTER', 'UNDO'}
 
