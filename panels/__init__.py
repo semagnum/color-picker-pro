@@ -25,19 +25,36 @@ panel_title = 'Color Picker Pro'
 
 def draw_panel(layout, context):
     wm = context.window_manager
-    layout.prop(wm, 'picker_max', text='Max')
-    layout.prop(wm, 'picker_mean', text='Mean')
-    layout.prop(wm, 'picker_median', text='Median')
-    layout.prop(wm, 'picker_min', text='Min')
-    layout.operator(IMAGE_OT_screen_picker.bl_idname, text='3x3 Color Picker', icon='EYEDROPPER').sqrt_length = 3
-    layout.operator(IMAGE_OT_screen_picker.bl_idname, text='5x5 Color Picker', icon='EYEDROPPER').sqrt_length = 5
-    layout.prop(wm, 'custom_size', slider=True)
-    tile_str = str(wm.custom_size)
-    custom_label = 'Custom ' + tile_str + 'x' + tile_str + ' Color Picker'
-    layout.operator(IMAGE_OT_screen_picker.bl_idname, text=custom_label,
-                    icon='EYEDROPPER').sqrt_length = wm.custom_size
+
+    layout.use_property_split = True
+    layout.use_property_decorate = False
+
+    col = layout.column()
+    col.prop(wm, 'picker_max', text='Picked Max')
+    col.prop(wm, 'picker_mean', text='Mean')
+    col.prop(wm, 'picker_median', text='Median')
+    col.prop(wm, 'picker_min', text='Min')
+
     layout.separator()
-    layout.operator(IMAGE_OT_screen_rect.bl_idname, text='Rect Color Picker', icon='SELECT_SET')
+
+    split = layout.split(factor=0.4)
+    split.alignment = 'RIGHT'
+    split.label(text='Color Picker 3x3')
+    split.operator(IMAGE_OT_screen_picker.bl_idname, text='', icon='EYEDROPPER').sqrt_length = 3
+
+    split = layout.split(factor=0.4)
+    split.alignment = 'RIGHT'
+    split.label(text='5x5')
+    split.operator(IMAGE_OT_screen_picker.bl_idname, text='', icon='EYEDROPPER').sqrt_length = 5
+
+    row = layout.row(align=True)
+    row.prop(wm, 'custom_size', slider=True, text='Custom')
+    row.operator(IMAGE_OT_screen_picker.bl_idname, text='', icon='EYEDROPPER').sqrt_length = wm.custom_size
+
+    split = layout.split(factor=0.4)
+    split.alignment = 'RIGHT'
+    split.label(text='Rectangle')
+    split.operator(IMAGE_OT_screen_rect.bl_idname, text='', icon='SELECT_SET')
 
 
 class IMAGE_PT_color_picker(bpy.types.Panel):
