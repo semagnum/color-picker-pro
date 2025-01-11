@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "color_picker_pro"
-version = "1.0.5"
+version = "1.1.0"
 name = "Color Picker Pro"
 tagline = "Extends color picker with a few extra features"
 maintainer = "Spencer Magnusson <semagnum+blenderextensions@gmail.com>"

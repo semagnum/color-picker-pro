@@ -47,7 +47,7 @@ def draw(operator):
     batch.draw(shader)
 
 
-class IMAGE_OT_screen_rect(bpy.types.Operator):
+class ScreenRectOperator(bpy.types.Operator):
     bl_idname = 'image.screen_rect'
     bl_label = 'Rectangle Color Picker'
     bl_description = 'Select a rectangle of the screen and extract its color information'

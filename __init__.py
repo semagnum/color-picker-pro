@@ -50,14 +50,12 @@ if "bpy" in locals():
 
 import bpy
 
-from .operators.IMAGE_OT_screen_rect import IMAGE_OT_screen_rect
-from .operators.IMAGE_OT_screen_picker import IMAGE_OT_screen_picker
-from .panels import IMAGE_PT_color_picker, VIEW_PT_color_picker, CLIP_PT_color_picker
+from . import operators, panels
 
 bl_info = {
     'name': 'Color Picker Pro',
     'author': 'Spencer Magnusson',
-    'version': (1, 0, 5),
+    'version': (1, 1, 0),
     'blender': (3, 2, 0),
     'location': '(Image Editor, Clip Editor, and 3D View) -> Misc',
     'description': 'Extends color picker with a few extra features',
@@ -65,29 +63,47 @@ bl_info = {
     'category': 'Generic',
 }
 
-classes = [IMAGE_OT_screen_picker, IMAGE_OT_screen_rect, IMAGE_PT_color_picker, VIEW_PT_color_picker,
-           CLIP_PT_color_picker]
+NAME = bl_info['name']
+
+
+def update_color(self, context):
+    wm = self
+
+    if not wm.update_target or not wm.update_source:
+        return
+
+    prop_real = eval(wm.update_target)
+    median_real = getattr(wm, wm.update_source)
+
+    prop_real[0] = median_real[0]
+    prop_real[1] = median_real[1]
+    prop_real[2] = median_real[2]
 
 
 window_manager_props = [
     ('picker_max', bpy.props.FloatVectorProperty(
         default=(1.0, 1.0, 1.0),
         precision=4,
+        name=NAME + ' Max',
         description='The max RGB values of the picked pixels',
         subtype='COLOR_GAMMA')),
     ('picker_min', bpy.props.FloatVectorProperty(
         default=(0.0, 0.0, 0.0),
         precision=4,
+        name=NAME + ' Min',
         description='The min RGB values of the picked pixels',
         subtype='COLOR_GAMMA')),
     ('picker_median', bpy.props.FloatVectorProperty(
         default=(0.5, 0.5, 0.5),
         precision=4,
+        name=NAME + ' Median',
         description='The median RGB values of the picked pixels',
+        update=update_color,
         subtype='COLOR_GAMMA')),
     ('picker_mean', bpy.props.FloatVectorProperty(
         default=(0.5, 0.5, 0.5),
         precision=4,
+        name=NAME + ' Mean',
         description='The mean RGB values of the picked pixels',
         subtype='COLOR_GAMMA')),
     ('custom_size', bpy.props.IntProperty(
@@ -98,6 +114,14 @@ window_manager_props = [
         name='Custom Size',
         subtype='PIXEL',
         description='Custom tile size for color picker')),
+    ('update_source', bpy.props.StringProperty(
+        default='',
+        options={'HIDDEN'}
+    )),
+    ('update_target', bpy.props.StringProperty(
+        default='',
+        options={'HIDDEN'}
+    ))
 ]
 
 
@@ -107,13 +131,13 @@ def register():
     for name, prop in window_manager_props:
         setattr(window_manager, name, prop)
 
-    for cls in classes:
-        bpy.utils.register_class(cls)
+    operators.register()
+    panels.register()
 
 
 def unregister():
-    for cls in classes[::-1]:
-        bpy.utils.unregister_class(cls)
+    panels.unregister()
+    operators.unregister()
 
     for name, _ in window_manager_props:
         try:

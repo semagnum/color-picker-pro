@@ -19,3 +19,16 @@ After pinning both corners, the operator will extract the rectangle's max, min, 
 Press escape (or right click, if you haven't left-clicked yet) to cancel.
 
 **Note**: these values are gamma corrected, so they reflect the values you see on the screen, *not* the true values in Blender before the colorspace conversion.
+
+## Update Color Properties
+
+Beside each of the color picker results,
+there is now a button to update other data properties in the file.
+Once the user provides a data path
+(which can be found by right-clicking a color property and selecting "Copy Full Data Path"),
+the add-on will automatically update the color property as the picker's color gets updated.
+
+**NOTE**: Since Blender gamma-corrects some color properties,
+results may not be as expected in some cases.
+But it seems like most painting tools (vertex paint, texture paint)
+does not have this conversion, and colors should match one-to-one.

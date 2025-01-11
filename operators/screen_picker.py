@@ -53,7 +53,7 @@ def draw(operator):
     edge_batch.draw(edge_shader)
 
 
-class IMAGE_OT_screen_picker(bpy.types.Operator):
+class ScreenPickerOperator(bpy.types.Operator):
     bl_idname = 'image.screen_picker'
     bl_label = 'Screen Picker'
     bl_options = {'REGISTER'}

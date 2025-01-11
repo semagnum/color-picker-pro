@@ -17,8 +17,7 @@ Created by Spencer Magnusson
 
 import bpy
 
-from ..operators.IMAGE_OT_screen_picker import IMAGE_OT_screen_picker
-from ..operators.IMAGE_OT_screen_rect import IMAGE_OT_screen_rect
+from ..operators import ScreenPickerOperator, ScreenRectOperator, CopyColorOperator, ClearUpdateOperator
 
 panel_title = 'Color Picker Pro'
 
@@ -29,32 +28,41 @@ def draw_panel(layout, context):
     layout.use_property_split = True
     layout.use_property_decorate = False
 
+    def draw_picker(layout, attr, **kwargs):
+        row = layout.row()
+        row.prop(wm, attr, **kwargs)
+        if wm.update_source == attr:
+            row.operator(ClearUpdateOperator.bl_idname, text='', icon='X')
+        else:
+            op = row.operator(CopyColorOperator.bl_idname, text='', icon='COPYDOWN')
+            op.picker_type = attr
+
     col = layout.column()
-    col.prop(wm, 'picker_max', text='Picked Max')
-    col.prop(wm, 'picker_mean', text='Mean')
-    col.prop(wm, 'picker_median', text='Median')
-    col.prop(wm, 'picker_min', text='Min')
+    draw_picker(col, 'picker_max', text='Picked Max')
+    draw_picker(col, 'picker_mean', text='Mean')
+    draw_picker(col, 'picker_median', text='Median')
+    draw_picker(col, 'picker_min', text='Min')
 
     layout.separator()
 
     split = layout.split(factor=0.4)
     split.alignment = 'RIGHT'
     split.label(text='Color Picker 3x3')
-    split.operator(IMAGE_OT_screen_picker.bl_idname, text='', icon='EYEDROPPER').sqrt_length = 3
+    split.operator(ScreenPickerOperator.bl_idname, text='', icon='EYEDROPPER').sqrt_length = 3
 
     split = layout.split(factor=0.4)
     split.alignment = 'RIGHT'
     split.label(text='5x5')
-    split.operator(IMAGE_OT_screen_picker.bl_idname, text='', icon='EYEDROPPER').sqrt_length = 5
+    split.operator(ScreenPickerOperator.bl_idname, text='', icon='EYEDROPPER').sqrt_length = 5
 
     row = layout.row(align=True)
     row.prop(wm, 'custom_size', slider=True, text='Custom')
-    row.operator(IMAGE_OT_screen_picker.bl_idname, text='', icon='EYEDROPPER').sqrt_length = wm.custom_size
+    row.operator(ScreenPickerOperator.bl_idname, text='', icon='EYEDROPPER').sqrt_length = wm.custom_size
 
     split = layout.split(factor=0.4)
     split.alignment = 'RIGHT'
     split.label(text='Rectangle')
-    split.operator(IMAGE_OT_screen_rect.bl_idname, text='', icon='SELECT_SET')
+    split.operator(ScreenRectOperator.bl_idname, text='', icon='SELECT_SET')
 
 
 class IMAGE_PT_color_picker(bpy.types.Panel):
@@ -85,3 +93,8 @@ class CLIP_PT_color_picker(bpy.types.Panel):
 
     def draw(self, context):
         draw_panel(self.layout, context)
+
+
+_classes_to_register = [IMAGE_PT_color_picker, VIEW_PT_color_picker, CLIP_PT_color_picker]
+
+register, unregister = bpy.utils.register_classes_factory(_classes_to_register)
