@@ -72,17 +72,24 @@ class ScreenRectOperator(bpy.types.Operator):
             self.end_x, self.end_y = event.mouse_x, event.mouse_y
             self.finished = time.time()
         elif self.finished is not None and (time.time() - self.finished) > 0.2:
+            fb = gpu.state.active_framebuffer_get()
+            min_x, min_y, max_x, max_y = fb.viewport_get()
 
             start_x, end_x = sorted([self.start_x, self.end_x])
             start_y, end_y = sorted([self.start_y, self.end_y])
 
+            # clamping is required for Vulkan
+            start_x = min(max(start_x, min_x), max_x)
+            end_x = min(max(end_x, min_x), max_x)
+            start_y = min(max(start_y, min_y), max_y)
+            end_y = min(max(end_y, min_y), max_y)
+
             x_len = (end_x - start_x) + 1
             y_len = (end_y - start_y) + 1
 
-            fb = gpu.state.active_framebuffer_get()
-            screen_buffer = fb.read_color(start_x, start_y, x_len, y_len, 3, 0, 'FLOAT')
+            screen_buffer = fb.read_color(start_x, start_y, x_len, y_len, 4, 0, 'FLOAT')
 
-            channels = np.array(screen_buffer.to_list()).reshape((x_len * y_len, 3))
+            channels = np.delete(np.array(screen_buffer.to_list()).reshape((x_len * y_len, 4)), 3, axis=1)
 
             wm = context.window_manager
 
