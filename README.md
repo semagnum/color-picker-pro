@@ -1,3 +1,5 @@
+> ANNOUNCEMENT: this is being mirrored and most up-to-date on Codeberg: [codeberg.org/semagnum/color_picker_pro](https://codeberg.org/semagnum/color_picker_pro)
+
 # Color Picker Pro
 This Blender addon extends functionality of the software's color picker.
 
