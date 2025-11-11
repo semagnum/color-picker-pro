@@ -55,7 +55,7 @@ from . import operators, panels
 bl_info = {
     'name': 'Color Picker Pro',
     'author': 'Spencer Magnusson',
-    'version': (1, 1, 0),
+    'version': (1, 1, 1),
     'blender': (3, 2, 0),
     'location': '(Image Editor, Clip Editor, and 3D View) -> Misc',
     'description': 'Extends color picker with a few extra features',
