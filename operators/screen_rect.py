@@ -21,10 +21,12 @@ from gpu_extras.batch import batch_for_shader
 import numpy as np
 import time
 
-UNIFORM_COLOR = '2D_UNIFORM_COLOR' if bpy.app.version < (3, 4, 0) else 'UNIFORM_COLOR'
+from .draw_config import UNIFORM_LINE_COLOR, IS_AFTER_4_5, config_line_shader
+
 indices = ((0, 1, 2), (2, 1, 3))
 try:
-    shader = gpu.shader.from_builtin(UNIFORM_COLOR)
+    shader = gpu.shader.from_builtin(UNIFORM_LINE_COLOR)
+    
 except SystemError as e:
     import logging
     log = logging.getLogger(__name__)
@@ -42,7 +44,7 @@ def draw(operator):
                   (end_x, end_y), (end_x, start_y),
                   (end_x, start_y), (start_x, start_y))
 
-    shader.uniform_float('color', (1.0, 1.0, 1.0, 1.0))
+    config_line_shader(shader, (1.0, 1.0, 1.0, 1.0))
     batch = batch_for_shader(shader, 'LINES', {"pos": draw_verts})
     batch.draw(shader)
 

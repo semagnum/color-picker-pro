@@ -19,14 +19,18 @@ import gpu
 from gpu_extras.batch import batch_for_shader
 import numpy as np
 
+from .draw_config import UNIFORM_COLOR, UNIFORM_LINE_COLOR, config_line_shader
+
 vertices = ((0, 0), (50, 0),
             (0, -50), (50, -50))
 indices = ((0, 1, 2), (2, 1, 3), (0, 1, 1), (1, 2, 2), (2, 2, 3), (3, 0, 0))
 
-UNIFORM_COLOR = '2D_UNIFORM_COLOR' if bpy.app.version < (3, 4, 0) else 'UNIFORM_COLOR'
+
+
+
 try:
     fill_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
-    edge_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
+    edge_shader = gpu.shader.from_builtin(UNIFORM_LINE_COLOR)
 except SystemError as e:
     import logging
     log = logging.getLogger(__name__)
@@ -42,7 +46,7 @@ def draw(operator):
     batch = batch_for_shader(fill_shader, 'TRIS', {"pos": draw_verts}, indices=indices)
     batch.draw(fill_shader)
 
-    edge_shader.uniform_float("color", (1.0, 0.0, 0.0, 1.0))
+    config_line_shader(edge_shader, (1.0, 0.0, 0.0, 1.0))
 
     edges = (draw_verts[0], draw_verts[1],
              draw_verts[0], draw_verts[2],
