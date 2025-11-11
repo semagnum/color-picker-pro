@@ -26,8 +26,6 @@ vertices = ((0, 0), (50, 0),
 indices = ((0, 1, 2), (2, 1, 3), (0, 1, 1), (1, 2, 2), (2, 2, 3), (3, 0, 0))
 
 
-
-
 try:
     fill_shader = gpu.shader.from_builtin(UNIFORM_COLOR)
     edge_shader = gpu.shader.from_builtin(UNIFORM_LINE_COLOR)
@@ -35,6 +33,7 @@ except SystemError as e:
     import logging
     log = logging.getLogger(__name__)
     log.warn('Failed to initialize gpu shader, draw will not work as expected')
+
 
 def draw(operator):
     m_x, m_y = operator.x, operator.y
@@ -68,27 +67,33 @@ class ScreenPickerOperator(bpy.types.Operator):
         return 'Extract color from a {}x{} square of pixels'.format(properties.sqrt_length, properties.sqrt_length)
 
     # square root of number of pixels taken into account, 3 is a 3x3 square
-    sqrt_length: bpy.props.IntProperty()
+    sqrt_length: bpy.props.IntProperty(default=3)
 
     def modal(self, context, event):
         context.area.tag_redraw()
         wm = context.window_manager
 
         if event.type in {'MOUSEMOVE', 'LEFTMOUSE'}:
-            distance = self.sqrt_length // 2
+            sqrt_length = self.sqrt_length
+            distance = sqrt_length // 2
 
-            start_x = max(event.mouse_x - distance, 0)
-            start_y = max(event.mouse_y - distance, 0)
+            fb = gpu.state.active_framebuffer_get()
+            min_x, min_y, max_x, max_y = fb.viewport_get()
+
+            mouse_x, mouse_y = event.mouse_x, event.mouse_y
 
             self.x = event.mouse_region_x
             self.y = event.mouse_region_y
 
-            fb = gpu.state.active_framebuffer_get()
-            screen_buffer = fb.read_color(start_x, start_y, self.sqrt_length, self.sqrt_length, 3, 0, 'FLOAT')
+            # clamping is required for Vulkan
+            region_x = min(max(mouse_x - distance, min_x), max_x - sqrt_length - 1)
+            region_y = min(max(mouse_y - distance, min_y), max_y - sqrt_length - 1)
+            screen_buffer = fb.read_color(region_x, region_y, sqrt_length, sqrt_length, 4, 0, 'FLOAT')
+            channels = np.delete(np.array(screen_buffer.to_list()).reshape((sqrt_length * sqrt_length, 4)), 3, axis=1)
 
-            channels = np.array(screen_buffer.to_list()).reshape((self.sqrt_length * self.sqrt_length, 3))
-
-            curr_picker_buffer = fb.read_color(event.mouse_x, event.mouse_y, 1, 1, 3, 0, 'FLOAT')
+            single_x = min(max(mouse_x, min_x), max_x - 1)
+            single_y = min(max(mouse_y, min_y), max_y - 1)
+            curr_picker_buffer = fb.read_color(single_x, single_y, 1, 1, 3, 0, 'FLOAT')
             self.curr_color = np.array(curr_picker_buffer.to_list()).reshape(-1)
 
             dot = np.sum(channels, axis=1)
