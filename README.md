@@ -3,11 +3,6 @@
 # Color Picker Pro
 This Blender addon extends functionality of the software's color picker.
 
-Please consider contributing by buying from the [Blender Market](https://blendermarket.com/products/color-picker-pro) (which funds Blender) or directly to me via Paypal.
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=LLDQGZ94K3ZUW&currency_code=USD&source=url)
-
-
 ## Average Color Picker
 Allows you to color pick anywhere in the Blender window in a 3x3 or 5x5 tile around your cursor.
 As you hover your cursor, the panels will update with the tile's max, min, mean, and median colors. 
